@@ -31,8 +31,7 @@
       <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener">Updates</a>
     </nav>
     <a class="btn btn-primary btn-sm nav-cta" href="#signup">Join waitlist</a>
-    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menu">
-      <span class="sr-only">Toggle menu</span>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
       <span class="bar" aria-hidden="true"></span>
       <span class="bar" aria-hidden="true"></span>
       <span class="bar" aria-hidden="true"></span>
@@ -227,22 +226,29 @@
   var menuBtn = document.getElementById('menu-btn');
   var menu = document.getElementById('mobile-menu');
   if (menuBtn && menu) {
+    function closeMenu() {
+      menu.classList.remove('open');
+      menuBtn.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
     menuBtn.addEventListener('click', function () {
       var open = menu.classList.toggle('open');
+      menuBtn.classList.toggle('open', open);
       menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && menu.classList.contains('open')) {
-        menu.classList.remove('open');
-        menuBtn.setAttribute('aria-expanded', 'false');
-      }
+      if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu();
     });
     menu.querySelectorAll('a').forEach(function (link) {
-      link.addEventListener('click', function () {
-        menu.classList.remove('open');
-        menuBtn.setAttribute('aria-expanded', 'false');
-      });
+      link.addEventListener('click', closeMenu);
     });
+    document.addEventListener('click', function (e) {
+      if (menu.classList.contains('open') && !menuBtn.contains(e.target) && !menu.contains(e.target)) closeMenu();
+    });
+    var mq = window.matchMedia('(min-width: 900px)');
+    var onWidth = function () { if (mq.matches) closeMenu(); };
+    if (mq.addEventListener) mq.addEventListener('change', onWidth);
+    else if (mq.addListener) mq.addListener(onWidth);
   }
 
   // Reveal on scroll
