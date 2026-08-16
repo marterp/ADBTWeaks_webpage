@@ -13,6 +13,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ADBTweaks — Pre-Release Waitlist">
 <meta name="twitter:description" content="Secure ADB shell, system tweaks, game profiles, app optimization and debloat — no root required. Join the waitlist.">
+<script>document.documentElement.classList.add('js');</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,6 +44,7 @@
       <a href="#signup">Signup</a>
       <a href="#privacy">Privacy</a>
       <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener">Updates</a>
+      <a class="btn btn-primary menu-cta" href="#signup">Join the waitlist</a>
     </div>
   </div>
 </header>
@@ -263,12 +265,18 @@
   var sticky = document.getElementById('sticky-cta');
   var hero = document.getElementById('hero');
   var signup = document.getElementById('signup');
+  var footer = document.querySelector('.footer');
   if (sticky && hero && signup) {
+    function isTyping() {
+      var el = document.activeElement;
+      return el && (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA');
+    }
     function updateSticky() {
       var heroGone = hero.getBoundingClientRect().bottom <= 0;
       var signupBox = signup.getBoundingClientRect();
       var signupVisible = signupBox.top < window.innerHeight && signupBox.bottom > 0;
-      sticky.classList.toggle('show', heroGone && !signupVisible);
+      var footerVisible = footer ? footer.getBoundingClientRect().top < window.innerHeight : false;
+      sticky.classList.toggle('show', heroGone && !signupVisible && !footerVisible && !isTyping());
     }
     window.addEventListener('scroll', updateSticky, { passive: true });
     window.addEventListener('resize', updateSticky);
