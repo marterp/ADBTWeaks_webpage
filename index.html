@@ -25,25 +25,29 @@
       ADBTweaks
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#features">Features</a>
-      <a href="#download">Download</a>
-      <a href="#privacy">Privacy</a>
-      <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener">Updates</a>
+      <a href="#features" data-nav-section="features">Features</a>
+      <a href="#download" data-nav-section="download">Download</a>
+      <a href="#privacy" data-nav-section="privacy">Privacy</a>
+      <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener">Updates <span class="external-mark" aria-hidden="true">↗</span></a>
     </nav>
-    <a class="btn btn-primary btn-sm nav-cta download-link" href="#" data-download-url="https://play.google.com/store/apps/details?id=com.mrp.adbt" id="nav-download">Download</a>
+    <a class="btn btn-primary btn-sm nav-cta download-link is-locked" href="#download" data-download-url="https://play.google.com/store/apps/details?id=com.mrp.adbt" id="nav-download" aria-disabled="true">Available Saturday</a>
     <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
       <span class="bar" aria-hidden="true"></span>
       <span class="bar" aria-hidden="true"></span>
       <span class="bar" aria-hidden="true"></span>
     </button>
   </div>
-  <div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
     <div class="wrap">
-      <a href="#features">Features</a>
-      <a href="#download">Download</a>
-      <a href="#privacy">Privacy</a>
-      <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener">Updates</a>
-      <a class="btn btn-primary menu-cta download-link" href="#" data-download-url="https://play.google.com/store/apps/details?id=com.mrp.adbt" id="mobile-download">Download on Google Play</a>
+      <div class="mobile-nav-head">
+        <span>Navigate</span>
+        <span class="mobile-nav-hint">ADBTweaks</span>
+      </div>
+      <a href="#features" data-nav-section="features"><span class="nav-index">01</span><span>Features</span></a>
+      <a href="#download" data-nav-section="download"><span class="nav-index">02</span><span>Download</span></a>
+      <a href="#privacy" data-nav-section="privacy"><span class="nav-index">03</span><span>Privacy</span></a>
+      <a href="https://youtube.com/@mister_p27official?si=9YWozc6C0TSWkbsm" target="_blank" rel="noopener"><span class="nav-index">04</span><span>Updates</span><span class="external-mark" aria-hidden="true">↗</span></a>
+      <a class="btn btn-primary menu-cta download-link is-locked" href="#download" data-download-url="https://play.google.com/store/apps/details?id=com.mrp.adbt" id="mobile-download" aria-disabled="true">Available Saturday</a>
     </div>
   </div>
 </header>
@@ -252,11 +256,13 @@
       menu.classList.remove('open');
       menuBtn.classList.remove('open');
       menuBtn.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
     }
     menuBtn.addEventListener('click', function () {
       var open = menu.classList.toggle('open');
       menuBtn.classList.toggle('open', open);
       menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menu.setAttribute('aria-hidden', open ? 'false' : 'true');
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu();
@@ -272,6 +278,30 @@
     if (mq.addEventListener) mq.addEventListener('change', onWidth);
     else if (mq.addListener) mq.addListener(onWidth);
   }
+
+  // Navigation state / scroll spy
+  var navLinks = document.querySelectorAll('[data-nav-section]');
+  var navSections = [];
+  navLinks.forEach(function (link) {
+    var id = link.getAttribute('data-nav-section');
+    var section = document.getElementById(id);
+    if (section && navSections.indexOf(section) === -1) navSections.push(section);
+  });
+  function updateNavState() {
+    var activeId = '';
+    var marker = window.scrollY + 120;
+    navSections.forEach(function (section) {
+      if (section.offsetTop <= marker) activeId = section.id;
+    });
+    navLinks.forEach(function (link) {
+      var active = link.getAttribute('data-nav-section') === activeId;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  updateNavState();
+  window.addEventListener('scroll', updateNavState, { passive: true });
 
   // Reveal on scroll
   var revealEls = document.querySelectorAll('.reveal');
