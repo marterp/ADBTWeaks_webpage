@@ -315,14 +315,6 @@
   updateNavState();
   window.addEventListener('scroll', updateNavState, { passive: true });
 
-  // Nav background transition on scroll
-  var navEl = document.querySelector('.nav');
-  if (navEl) {
-    function onNavScroll() { navEl.classList.toggle('scrolled', window.scrollY > 8); }
-    window.addEventListener('scroll', onNavScroll, { passive: true });
-    onNavScroll();
-  }
-
   // Reveal on scroll
   var revealEls = document.querySelectorAll('.reveal');
   if (reducedMotion || !('IntersectionObserver' in window)) {
