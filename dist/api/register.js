@@ -18,28 +18,6 @@ function json(res, status, body) {
   return res.end(JSON.stringify(body));
 }
 
-function configuredOrigins() {
-  return (process.env.SITE_URL || '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean)
-    .map((value) => value.replace(/\/$/, ''));
-}
-
-function originAllowed(req) {
-  const origin = req.headers.origin;
-  if (!origin) return false;
-
-  const configured = configuredOrigins();
-  if (configured.length > 0) return configured.includes(origin);
-
-  try {
-    const url = new URL(origin);
-    return url.protocol === 'https:' && url.hostname.endsWith('.vercel.app');
-  } catch {
-    return false;
-  }
-}
 
 function normalizeEmail(value) {
   return String(value || '').trim().toLowerCase();
@@ -60,80 +38,3 @@ export default async function handler(req, res) {
     return json(res, 405, { ok: false, error: 'Method not allowed' });
   }
 
-  if (!originAllowed(req)) {
-    return json(res, 403, { ok: false, error: 'Forbidden' });
-  }
-
-  const contentType = String(req.headers['content-type'] || '').toLowerCase();
-  if (!contentType.includes('application/json')) {
-    return json(res, 415, { ok: false, error: 'Unsupported content type' });
-  }
-
-  const body = req.body && typeof req.body === 'object' ? req.body : {};
-
-  // Honeypot for basic bots.
-  if (clean(body.website) !== '') {
-    return json(res, 400, { ok: false, error: 'Invalid submission' });
-  }
-
-  const email = normalizeEmail(body.email);
-  const androidVersion = clean(body.android_version).toLowerCase();
-  const deviceModel = clean(body.device_model);
-
-  if (!validEmail(email)) {
-    return json(res, 400, { ok: false, error: 'Enter a valid email address' });
-  }
-
-  if (!ALLOWED_ANDROID_VERSIONS.has(androidVersion)) {
-    return json(res, 400, { ok: false, error: 'Select a valid Android version' });
-  }
-
-  if (deviceModel.length > MAX_DEVICE_MODEL_LENGTH) {
-    return json(res, 400, { ok: false, error: 'Device model is too long' });
-  }
-
-  const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-  const secret = process.env.REGISTRATION_SECRET;
-
-  if (!scriptUrl || !secret) {
-    console.error('Registration backend is not configured');
-    return json(res, 500, { ok: false, error: 'Registration is temporarily unavailable' });
-  }
-
-  try {
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        token: secret,
-        email,
-        android_version: androidVersion,
-        device_model: deviceModel
-      })
-    });
-
-    const text = await response.text();
-    let result = {};
-    try {
-      result = text ? JSON.parse(text) : {};
-    } catch {
-      result = {};
-    }
-
-    if (!response.ok || !result.ok) {
-      const status = Number(result.status) || response.status || 500;
-      if (status === 409) {
-        return json(res, 409, { ok: false, error: 'This email is already registered' });
-      }
-      console.error('Apps Script registration failed:', status, result.error || 'unknown error');
-      return json(res, 500, { ok: false, error: 'Unable to save your registration right now' });
-    }
-
-    return json(res, 200, { ok: true });
-  } catch (error) {
-    console.error('Registration request failed:', error.message);
-    return json(res, 500, { ok: false, error: 'Unable to save your registration right now' });
-  }
-}
