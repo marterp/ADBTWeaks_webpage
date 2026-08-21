@@ -30,7 +30,7 @@
     <p>
       This policy explains how the <strong>ADBTweaks website</strong> handles the
       information you provide when you register to be notified about the ADBTweaks
-      pre-release. It applies only to this website and the signup form. The
+      release. It applies only to this website and the signup form. The
       Android app itself is covered by the separate Privacy Policy packaged inside
       the app.
     </p>
@@ -39,7 +39,7 @@
     <p>When you use the release update form, we ask for:</p>
     <ul>
       <li><strong>Email address</strong> — required, so we can notify you when the Google Play release is available.</li>
-      <li><strong>Target Android version</strong> — optional; helps us prioritize compatibility testing.</li>
+      <li><strong>Target Android version</strong> — required; helps us prioritize compatibility testing.</li>
       <li><strong>Device model</strong> — optional; used only to prioritize testing against the devices people use.</li>
     </ul>
     <p>We do not ask for, and do not require, a name, account, or password.</p>
@@ -54,18 +54,18 @@
 
     <h2>3. Who processes it</h2>
     <p>
-      Submissions are collected through <strong>Formspree</strong>, a form-processing
-      service. Formspree stores the submission data on their infrastructure and is
-      the data processor for the purposes of this form. See
-      <a href="https://formspree.io/legal/privacy-policy/" rel="noopener noreferrer" target="_blank">Formspree&rsquo;s privacy policy</a>
-      for details on their storage and security practices.
+      Submissions are received by an API endpoint hosted by <strong>Vercel</strong>.
+      The API uses a private Google Cloud service account to write registration data
+      to a restricted <strong>Google Sheet</strong>. The service-account credentials are
+      stored only as server-side deployment secrets and are never sent to your browser.
     </p>
 
     <h2>4. Sharing</h2>
     <p>We do not sell, rent, or trade your information. It is shared only with:</p>
     <ul>
-      <li><strong>Formspree</strong>, as the form processor described above, and</li>
-      <li>Service providers needed to send the release notification emails, if the email delivery is handled by a third-party mailing service.</li>
+      <li><strong>Vercel</strong>, which hosts the website API endpoint, and</li>
+      <li><strong>Google</strong>, because the registration row is stored in Google Sheets.</li>
+      <li>Service providers needed to send release notification emails, if email delivery is handled by a third-party mailing service.</li>
     </ul>
 
     <h2>5. Retention</h2>
@@ -77,10 +77,11 @@
 
     <h2>6. Security</h2>
     <p>
-      The form is submitted over an encrypted (HTTPS) connection, and Formspree
-      applies access controls and monitoring to the data it stores. No method of
-      transmission or storage is completely secure, and we cannot guarantee
-      absolute security.
+      The form is submitted over HTTPS. Google service-account credentials are kept
+      in server-side environment variables and are not exposed to the browser.
+      The API validates fields, restricts cross-origin submissions, and rejects
+      duplicate email registrations. No method of transmission or storage is
+      completely secure, and we cannot guarantee absolute security.
     </p>
 
     <h2>7. Your rights</h2>
