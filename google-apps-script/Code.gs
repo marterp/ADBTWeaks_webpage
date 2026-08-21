@@ -5,7 +5,7 @@
 // 4. Deploy as Web app: Execute as Me, Who has access: Anyone.
 // 5. Put the deployment /exec URL and the same secret into Vercel.
 
-const REGISTRATION_SECRET = 'CHANGE_THIS_TO_A_LONG_RANDOM_SECRET';
+const REGISTRATION_SECRET = 'ADBTweaks-8fK29xP4mQ7vL3';
 const SHEET_NAME = 'Registrations';
 const ALLOWED_ANDROID_VERSIONS = new Set([
   'android-10', 'android-11', 'android-12', 'android-13',

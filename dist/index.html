@@ -137,12 +137,12 @@
       <div class="download-card reveal">
         <div>
           <span class="eyebrow"><span class="dot" aria-hidden="true"></span> Google Play release</span>
-          <h2>ADBTweaks is almost ready.</h2>
-          <p>Download the app from Google Play starting <strong>Saturday, August 22, 2026</strong>.</p>
+          <h2>ADBTweaks is ready for Beta Test.</h2>
+          <p>Download the app from Google Play now <strong>Beta Test</strong>.</p>
         </div>
         <div class="download-actions">
           <a class="btn btn-primary btn-lg download-link is-locked" id="download-btn" href="#" data-download-url="https://play.google.com/store/apps/details?id=com.mrp.adbt" aria-disabled="true">Download on Google Play</a>
-          <p class="download-note" id="download-note">Unavailable now — the app launches on Google Play <strong>Saturday, August 22, 2026</strong>.</p>
+          <p class="download-note" id="download-note">Available now — the app is available on Google Play <strong>Download Now</strong>.</p>
         </div>
       </div>
     </div>
@@ -151,8 +151,8 @@
   <section id="signup">
     <div class="wrap">
       <div class="signup-card reveal">
-        <h2>Pre-register to download the app</h2>
-        <p>We'll email you when ADBTweaks is available.</p>
+        <h2>Register to download the app</h2>
+        <p>ADBTweaks is available on Play Store register to download the app.</p>
 
         <div class="form-status" id="form-status" role="status" aria-live="polite">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
@@ -180,7 +180,6 @@
               <option value="android-14">Android 14</option>
               <option value="android-15">Android 15</option>
               <option value="android-16">Android 16</option>
-              <option value="other">Other / not sure</option>
             </select>
             <span class="field-error" id="android-error">Please select your Android version.</span>
           </div>
@@ -188,7 +187,7 @@
             <label for="model">Device model <span style="color:var(--on-surface-variant);font-weight:400;">(optional)</span></label>
             <input type="text" id="model" name="device_model" placeholder="e.g. Pixel 8 Pro" autocomplete="off">
           </div>
-          <button type="submit" class="btn btn-primary btn-lg signup-btn" id="signup-btn">Pre-register</button>
+          <button type="submit" class="btn btn-primary btn-lg signup-btn" id="signup-btn">Register</button>
           <p class="consent">We only use your email to tell you when ADBTweaks launches. See the <a href="privacy.html">Privacy Policy</a>.</p>
         </form>
       </div>
@@ -250,7 +249,7 @@
   <div class="modal modal-success" role="dialog" aria-modal="true" aria-labelledby="modal-success-title" aria-describedby="modal-success-desc">
     <span class="modal-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
     <h3 id="modal-success-title">Registered successfully</h3>
-    <p id="modal-success-desc">We'll email you when ADBTweaks launches.</p>
+    <p id="modal-success-desc">We'll email you when ADBTweaks ready for your device.</p>
     <div class="modal-actions">
       <button class="btn btn-primary" type="button" data-modal-close>Done</button>
     </div>
@@ -461,7 +460,7 @@
       statusText.textContent = 'Unable to connect right now — please try again.';
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Pre-register';
+      submitBtn.textContent = 'Register';
     }
   });
 })();
