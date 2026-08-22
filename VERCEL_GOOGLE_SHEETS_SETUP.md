@@ -1,105 +1,98 @@
-# ADBTweaks — Simple Vercel + Google Sheets Setup
+# ADBTweaks Registration — Easy Connection Setup
 
-This version does not require Google Cloud, a service account, API keys, or a downloaded JSON credential.
+The website does not need a Google URL in the form, HTML, or client-side JavaScript.
+The Google connection is kept inside Vercel's server environment.
 
-## 1. Create the Google Sheet
+## How it works
 
-Create a Google Sheet and rename the first tab to:
+Website form → Vercel `/api/register` → Google Apps Script → private Google Sheet
 
-`Registrations`
+## Step 1 — Create the Sheet
 
-In row 1 enter:
+Create a Google Sheet and rename the first tab to `Registrations`.
+
+Put these headers in row 1:
 
 `Timestamp | Email | Android Version | Device Model`
 
-Keep the sheet private.
+Keep the Sheet private.
 
-## 2. Create the Google Apps Script
+## Step 2 — Add the Apps Script
 
-In the Sheet, open:
+In the Sheet open **Extensions → Apps Script**.
 
-**Extensions → Apps Script**
+Copy `google-apps-script/Code.gs` from this project into the editor.
 
-Open `google-apps-script/Code.gs` from this project and paste it into Apps Script.
-
-Change this line:
+Change only this line:
 
 `const REGISTRATION_SECRET = 'CHANGE_THIS_TO_A_LONG_RANDOM_SECRET';`
 
-Use a long random secret, for example 40+ random characters.
+Use a long random secret. Keep it private.
 
-## 3. Deploy the Apps Script
+Save.
 
-Choose:
+## Step 3 — Deploy Apps Script
 
-**Deploy → New deployment → Web app**
+Choose **Deploy → New deployment → Web app**.
 
 Use:
 
 - Execute as: **Me**
 - Who has access: **Anyone**
 
-Deploy and copy the `/exec` URL.
+Click **Deploy** and authorize the script.
 
-The sheet itself stays private. Only the Apps Script needs access to it.
+Copy the Web app `/exec` URL. You only need it for the Vercel server setting; it is not shown on the website.
 
-## 4. Add 3 Vercel variables
+## Step 4 — Connect Vercel
 
-Vercel → Project → Settings → Environment Variables:
+In Vercel open:
 
-`GOOGLE_APPS_SCRIPT_URL`
+**Project → Settings → Environment Variables**
 
-Paste the `/exec` URL.
+Add exactly two variables:
 
-`REGISTRATION_SECRET`
+### `GOOGLE_APPS_SCRIPT_URL`
 
-Paste the exact same secret you put in `Code.gs`.
+Value: the Apps Script `/exec` URL from Step 3.
 
-`SITE_URL`
+### `REGISTRATION_SECRET`
 
-Your website URL, for example:
+Value: exactly the same secret used in `Code.gs`.
 
-`https://adbtweaks.vercel.app`
+No `SITE_URL` setting is required.
 
-For a custom domain, use the custom-domain URL instead.
+## Step 5 — Redeploy
 
-## 5. Deploy the website
+Redeploy the Vercel project after saving the two variables.
 
-Push the project to GitHub or upload it to Vercel and deploy normally.
+## Step 6 — Test
 
-The form submits to:
+Open the deployed website and submit the registration form.
 
-`/api/register`
+A successful submission adds a new row to `Registrations`.
 
-The browser never receives the Google Apps Script URL or registration secret.
+Submitting the same email again returns:
 
-## 6. Test
+`This email is already registered`
 
-Submit the form once.
+## If the form says “Unable to connect”
 
-A new row should appear in `Registrations`.
+Check these in order:
 
-Submit the same email again. It should be rejected as already registered.
+1. Apps Script deployment is **Web app**.
+2. **Execute as** is **Me**.
+3. **Who has access** is **Anyone**.
+4. The Vercel `GOOGLE_APPS_SCRIPT_URL` ends in `/exec`.
+5. The Vercel `REGISTRATION_SECRET` exactly matches the Apps Script secret.
+6. Redeploy Vercel after changing environment variables.
+7. Submit the form again after opening the newest deployment.
 
 ## Security
 
-The Vercel API:
-
-- accepts POST only;
-- checks the website Origin;
-- validates email and Android version;
-- limits device-model length;
-- rejects the hidden honeypot field;
-- keeps the Apps Script URL and secret server-side;
-- does not expose Google credentials to visitors.
-
-The Apps Script:
-
-- requires the shared secret;
-- validates all fields again;
-- uses a script lock to prevent duplicate race conditions;
-- checks for duplicate emails;
-- prevents spreadsheet formula injection;
-- writes directly to the private spreadsheet.
-
-Do not put `REGISTRATION_SECRET` in client-side JavaScript or HTML.
+- No Google credentials are placed in the website.
+- No Google connection URL is exposed in the form UI.
+- The shared secret is only in Vercel and Apps Script.
+- Input is validated on both sides.
+- Duplicate emails are blocked.
+- Spreadsheet formula injection is filtered.

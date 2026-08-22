@@ -18,24 +18,15 @@ function json(res, status, body) {
   return res.end(JSON.stringify(body));
 }
 
-function configuredOrigins() {
-  return (process.env.SITE_URL || '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean)
-    .map((value) => value.replace(/\/$/, ''));
-}
-
 function originAllowed(req) {
-  const origin = req.headers.origin;
-  if (!origin) return false;
-
-  const configured = configuredOrigins();
-  if (configured.length > 0) return configured.includes(origin);
+  // The endpoint is same-origin from the website, so no CORS headers are needed.
+  // Allow missing Origin for browser privacy modes and server-side smoke tests.
+  const origin = String(req.headers.origin || '').trim();
+  if (!origin) return true;
 
   try {
     const url = new URL(origin);
-    return url.protocol === 'https:' && url.hostname.endsWith('.vercel.app');
+    return url.protocol === 'https:';
   } catch {
     return false;
   }
@@ -110,20 +101,25 @@ export default async function handler(req, res) {
         })
       });
 
-      const text = await response.text();
       let result = {};
-      try {
-        result = text ? JSON.parse(text) : {};
-      } catch {
-        result = {};
+      if (response.ok) {
+        const text = await response.text();
+        try {
+          result = text ? JSON.parse(text) : {};
+        } catch {
+          result = {};
+        }
+      } else {
+        const text = await response.text();
+        result = { ok: false, error: text || 'Apps Script error', status: response.status };
       }
 
-      if (!response.ok || !result.ok) {
-        const status = Number(result.status) || response.status || 500;
+      if (!result.ok) {
+        const status = Number(result.status) || 500;
         if (status === 409) {
           return json(res, 409, { ok: false, error: 'This email is already registered' });
         }
-        console.error('Apps Script registration failed:', status, result.error || 'unknown error');
+        console.error('Apps Script registration failed:', result.status, result.error || 'unknown error');
         return json(res, 500, { ok: false, error: 'Unable to save your registration right now' });
       }
 
@@ -134,7 +130,5 @@ export default async function handler(req, res) {
     }
   }
 
-  // Backend not configured: return success without saving to Google Sheets.
-  // Duplicate validation is not available when the backend is disabled.
-  return json(res, 200, { ok: true });
+  return json(res, 503, { ok: false, error: 'Registration service is not configured' });
 }
