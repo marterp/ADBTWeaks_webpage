@@ -5,7 +5,7 @@
 // 4. Deploy as Web app: Execute as Me, Who has access: Anyone.
 // 5. Put the deployment /exec URL and the same secret into Vercel.
 
-const REGISTRATION_SECRET = 'CHANGE_THIS_TO_A_LONG_RANDOM_SECRET';
+const REGISTRATION_SECRET = 'CHANGE_THIS_TO_YOUR_SECRET';
 const SHEET_NAME = 'Registrations';
 const ALLOWED_ANDROID_VERSIONS = new Set([
   'android-10', 'android-11', 'android-12', 'android-13',
@@ -31,15 +31,15 @@ function normalizeEmail(value) {
 
 function doPost(e) {
   try {
-    const payload = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    const params = (e && e.parameter) ? e.parameter : {};
 
-    if (payload.token !== REGISTRATION_SECRET) {
+    if (String(params.secret || '') !== REGISTRATION_SECRET) {
       return json({ ok: false, status: 403, error: 'Forbidden' });
     }
 
-    const email = normalizeEmail(payload.email);
-    const androidVersion = String(payload.android_version || '').trim().toLowerCase();
-    const deviceModel = String(payload.device_model || '').trim();
+    const email = normalizeEmail(params.email);
+    const androidVersion = String(params.android_version || '').trim().toLowerCase();
+    const deviceModel = String(params.device_model || '').trim();
 
     if (!email || email.length > MAX_EMAIL_LENGTH || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return json({ ok: false, status: 400, error: 'Invalid email' });
@@ -53,7 +53,6 @@ function doPost(e) {
       return json({ ok: false, status: 400, error: 'Device model too long' });
     }
 
-    // Prevent duplicate registrations even when two requests arrive together.
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
 
@@ -79,7 +78,7 @@ function doPost(e) {
         clean(deviceModel)
       ]);
 
-      return json({ ok: true });
+      return json({ ok: true, status: 200 });
     } finally {
       lock.releaseLock();
     }

@@ -6,4 +6,4 @@ for (const file of ['index.html', 'privacy.html', 'style.css', 'ic_launcher.png'
   cpSync(file, join('dist', file));
 }
 rmSync('dist/api', { recursive: true, force: true });
-console.log('Built static dist/. Vercel detects /api/register.js as a serverless function from the project root.');
+console.log('Built dist/');
